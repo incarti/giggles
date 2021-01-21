@@ -7,6 +7,8 @@
       body{
 
           letter-spacing: -.1rem;
+          background-color: rgb(255, 255, 255);
+
          
       }
 
@@ -14,13 +16,15 @@
 
       button{
           border: none;
-          background-color: rgb(255, 0, 0);
+          background-color: rgb(255, 255, 255);
           width: 90%;
           padding: 0px;
           margin: 2em;
           border-radius: 15px;
-          color: rgb(255, 255, 255);
+          color: rgb(252, 252, 252);
           font-family: arialBlack;
+          box-shadow: rgba(0, 0, 0, 0.274) 0px 7px 29px 0px; 
+
       }
 
       .info{
@@ -48,7 +52,7 @@ overflow: hidden; /* Hide scroll bar */
 
 /* MIDDLE CONTAINER */
 .ticker-wrap {
-  padding-top: 0em;
+  margin-top: 3em;
 width: 100%;
 padding-left: 0%; /* Push contents to right side of screen */
 
@@ -71,14 +75,13 @@ animation-name: ticker;
 animation-duration: 30s;
 }
 .ticker-move:hover{
-animation-play-state: paused; /* Pause scroll on mouse hover */
 }
 
 /* ITEMS */
 .ticker-item{
 display: inline-block; /* Lay items in a horizontal line */
 padding: 0 2rem;
-font-size: 1em;
+font-size: 5em;
 color: rgb(0, 0, 0);
 font-family: arialBlack;
 }
@@ -164,7 +167,7 @@ a{
 }
 
 .boxed{
-box-shadow: rgba(228, 228, 228, 0.938) 0px 7px 29px 0px; 
+box-shadow: rgba(0, 0, 0, 0.596) 0px 7px 29px 0px; 
  margin: 1em; 
 border-radius: 1em;
 background-color: rgb(255, 255, 255);
@@ -173,7 +176,7 @@ background-color: rgb(255, 255, 255);
 }
 
 .shadowProduct{
-box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;  
+box-shadow: rgba(17, 17, 17, 0.486) 0px 4px 12px;  
 padding-left: 1em;
 padding-right: 15em;
 padding-top: 1em;

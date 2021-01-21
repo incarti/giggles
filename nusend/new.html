@@ -50,10 +50,197 @@
     </div>
 
     <div class="info ">
-        <h1 style="font-family: arialBlack;">LIBENS DAO</h1>
+        <h1 style="font-family: arialBlack;" id="content"></h1>
         <h3>PRODUCTS</h3><hr>
 
-        <div class="container">
+        <div class="container" style="margin-left: 0em;">
+        <script>
+                const peers = ['https://gun-us.herokuapp.com/gun','https://gun-eu.herokuapp.com/gun', 'https://gunjs.herokuapp.com/gun'];
+                const gun = Gun({localStorage:false, peers:peers});
+                const user = gun.user();
+                const SEA = Gun.SEA;
+                var myKeys = {};
+                var urlPassword = '';
+                var currentTitle = '';
+                var hash = '';
+                const savedTextEl = document.getElementById('savedText');
+    
+                async function publish() {
+                    localStorage.setItem(myKeys.pub, JSON.stringify(myKeys));
+                    await gun.get(`APAC#`).get(hash).promPut(myKeys.pub); 
+                    var url = `?t=${encodeURIComponent(currentTitle.replace(/\s+/g, '-').toLowerCase())}&p=${urlPassword}#${hash}`
+                    history.pushState({},'', url);
+                    location.reload();
+                }
+    
+                function copyLink(buttonElement) {
+                navigator.clipboard.writeText(location.href).then(function() {
+                    buttonElement.innerText = 'Copied';
+                }, function() {
+                    buttonElement.innerText = 'Copy permissions denied';
+                });
+                }
+    
+                function deleteArticle(buttonElement) {
+                    user.get('articles').get(hash).map().once(async (node, nodeID) => {
+                        user.get('articles').get(hash).get(nodeID).promPut(null);
+                    })
+                    localStorage.removeItem(myKeys.pub);
+                    buttonElement.innerText = 'Deleted';
+                }
+    
+                function debounce(func, delay) {
+                    let inDebounce
+                    return function() {
+                        const context = this
+                        const args = arguments
+                        clearTimeout(inDebounce)
+                        inDebounce = setTimeout(() => func.apply(context, args), delay)
+                    }
+                }
+    
+                async function save(event, editable) {
+                    savedTextEl.classList.remove('fadeInAndOut');
+                    void savedTextEl.offsetWidth;
+                    
+                    var content = '';
+                    var name = '';
+                    if (event.id){
+                        name = event.id
+                        content = event.value
+                    } else if (event.target) {
+                        name = event.target.id
+                        content = editable.innerHTML;
+                    }
+                    if (name === 'title') { currentTitle = editable.innerText }
+                    var encNode = await SEA.encrypt(content, urlPassword)
+                    await user.get('articles').get(hash).get(name).promPut(encNode)
+                    var encTime = await SEA.encrypt(new Date().toUTCString(), urlPassword)
+                    await user.get('articles').get(hash).get('lastUpdated').promPut(encTime);
+    
+                    savedTextEl.classList.add('fadeInAndOut');
+                }
+    
+                function renderArticle(authorPub, articleHash, audienceType) {
+                    if (audienceType == 'create') {
+                        var editorTitle = new MediumEditor('#title', {placeholder: {
+                            text: 'Clique',
+                            hideOnClick: false
+                        }, spellcheck: false, disableReturn: true,toolbar: false});
+                        var editorAuthor = new MediumEditor('#author', {placeholder: {
+                            text: 'Name',
+                            hideOnClick: false
+                        }, spellcheck: false, disableReturn: true,toolbar: false});
+                        var editorWallet = new MediumEditor('#wallet', {placeholder: {
+                            text: 'Wallet Address',
+                            hideOnClick: false
+                        }, spellcheck: false, disableReturn: true,toolbar: false});
+                        var editorPrice = new MediumEditor('#price', {placeholder: {
+                            text: 'Price',
+                            hideOnClick: false
+                        }, spellcheck: false, disableReturn: true,toolbar: false});
+                        var editorContent = new MediumEditor('#content', {
+                            placeholder: {
+                                text: 'Product',
+                                hideOnClick: false
+                            }, 
+                            spellcheck: true,
+                            autoLink: true,
+                            toolbar: { 
+                                buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote', 'pre', 'unorderedlist','orderedlist'] 
+                            }
+                        });
+                        editorTitle.subscribe('editableInput', debounce(save, 1000));
+                        editorAuthor.subscribe('editableInput', debounce(save, 1000));
+                        editorWallet.subscribe('editableInput', debounce(save, 1000));
+                        editorPrice.subscribe('editableInput', debounce(save, 1000));
+                        editorContent.subscribe('editableInput', debounce(save, 1000));
+    
+                        document.getElementById('publishButton').style.cssText = "";
+                        document.getElementById('about').style.cssText = "";
+                    } 
+                    else if (audienceType == 'read') {
+                        gun.get(`~${authorPub}`).get('articles').get(articleHash).map().once(async (node, nodeID) => {
+                            if (nodeID !== 'pass') {
+                                var decNode = await SEA.decrypt(node, urlPassword);
+                                if (nodeID == 'verification') {
+                                    document.getElementById('verification').outerHTML = `<a href="${DOMPurify.sanitize(decNode)}">${DOMPurify.sanitize(decNode)}</a>`;
+                                    document.getElementById('verificationSection').style.display = "";
+                                } else {
+                                    document.getElementById(nodeID).innerHTML = DOMPurify.sanitize(decNode);
+                                }
+                            }
+                        })
+                        document.getElementById('meta').style.display = "";
+                        document.getElementById('copyButton').style.display = "";
+                    } 
+                    else if (audienceType == 'update') {
+                        gun.get(`~${authorPub}`).get('articles').get(articleHash).map().once(async (node, nodeID) => {
+                            if (nodeID !== 'pass') {
+                                var decNode = await SEA.decrypt(node, urlPassword);
+                                if (nodeID == 'verification') {
+                                    document.getElementById(nodeID).value = DOMPurify.sanitize(decNode);
+                                } else {
+                                    document.getElementById(nodeID).innerHTML = DOMPurify.sanitize(decNode);
+                                }
+                            }
+                        })
+                        
+                        var editorTitle = new MediumEditor('#title', {placeholder: false, spellcheck: false, disableReturn: true,toolbar: false});
+                        var editorAuthor = new MediumEditor('#author', {placeholder: false, spellcheck: false, disableReturn: true,toolbar: false});
+                        var editorWallet = new MediumEditor('#wallet', {placeholder: false, spellcheck: false, disableReturn: true,toolbar: false});
+                        var editorPrice = new MediumEditor('#price', {placeholder: false, spellcheck: false, disableReturn: true,toolbar: false});
+                        var editorContent = new MediumEditor('#content', {
+                            placeholder: false, 
+                            spellcheck: true, 
+                            autoLink: true,
+                            toolbar: { 
+                                buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote', 'pre', 'unorderedlist','orderedlist'] 
+                            }
+                        });
+                        editorTitle.subscribe('editableInput', debounce(save, 1000));
+                        editorAuthor.subscribe('editableInput', debounce(save, 1000));
+                        editorWallet.subscribe('editableInput', debounce(save, 1000));
+                        editorPrice.subscribe('editableInput', debounce(save, 1000));
+                        editorContent.subscribe('editableInput', debounce(save, 1000));
+    
+                        document.getElementById('meta').style.display = "";
+                        document.getElementById('copyButton').style.display = "";
+                        document.getElementById('verificationSection').style.display = "";
+                        document.getElementById('deleteButton').style.display = "";
+                    }
+                    document.getElementById('app').style.cssText = "";
+                }
+                
+                async function go() {
+                    if (window.location.search) {
+                        urlPassword = new URLSearchParams(window.location.search).get("p");
+                        hash = window.location.hash.slice(1)
+                        var authorPubKey = await gun.get('APAC#').get(hash).promOnce();
+                        authorPubKey = authorPubKey.data
+                        var localstorageKeyPair = localStorage.getItem(authorPubKey);
+                        if (localstorageKeyPair) {
+                            myKeys = JSON.parse(localstorageKeyPair);
+                            user.auth(myKeys);
+                            if (user.is) {
+                                renderArticle(authorPubKey, hash, 'update');
+                            }
+                        } else {
+                            renderArticle(authorPubKey, hash, 'read');
+                        }
+                    } else {
+                        myKeys = await SEA.pair();
+                        urlPassword = SEA.random(11).toString('hex');
+                        user.auth(myKeys);
+                        hash = await SEA.work(myKeys.pub, null, null, {name: "SHA-256"});
+                        var encPass = await SEA.encrypt(urlPassword, myKeys);
+                        await user.get('articles').get(hash).get('pass').promPut(encPass);
+                        renderArticle(myKeys.pub, hash, 'create');
+                    }
+                }
+                go();
+        </script>
+    
             <table>
                 <thead>
                     <tr>
@@ -96,29 +283,18 @@
                     <tr>
                         <td><h4></h4></td>
                         <td>
-                            <div class="shadowProduct">
+                            <div class="shadowProduct" >
 
-                                <h4>PAY</h4>
+                                <h4 id="price"></h4>
                             </div>
                         </td>
                         <td>
                             <div class="shadowProduct">
 
-                                <h4>PAY</h4>
+                                <h4 id="author"></h4>
                             </div>
                         </td>
-                        <td>
-                            <div class="shadowProduct">
-
-                                <h4>PAY</h4>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="shadowProduct">
-
-                                <h4>PAY</h4>
-                            </div>
-                        </td>
+                        
                     </tr>
                     <tr>
                         <td><h4></h4></td>
@@ -138,6 +314,12 @@
                 </tbody>
             </table>
         </div>
+
+
+        <h3>ABOUT</h3><hr>
+        <article class="media">
+            <h5>Libens  was founded in 2020</h5>
+        </article>
 
         <br>
 
