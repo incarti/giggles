@@ -1,4 +1,4 @@
-.scrolling-wrapper ,ul {
+.scrolling-wrapper  {
     overflow-x: scroll;
     overflow-y: hidden;
     white-space: nowrap;
@@ -8,7 +8,7 @@
 
   .card , li{
     display: inline-block;
-    height: 9em;
+    height: auto;
     min-width: 9em;
     background-color: none;
     border-radius: 1em;
@@ -18,5 +18,24 @@
   }
 
   .cardText{
-      font-size: 2em
+      font-size: 1em
   }
+
+
+  .svg-icon {
+    width: 2em;
+    height: 2em;
+    }
+    
+    .svg-icon path,
+    .svg-icon polygon,
+    .svg-icon rect {
+    fill: #ffffff;
+    }
+    
+    .svg-icon circle {
+    stroke: #4691f6;
+    stroke-width: 1;
+    }
+    
+    
