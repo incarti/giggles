@@ -968,3 +968,15 @@ SVG Icons - svgicons.sparkk.fr
   stroke: #4691f6;
   stroke-width: 3;
 }
+
+.inputbox{
+  background-color: rgb(241, 241, 241);
+  border-radius: 15px;
+  border: none;
+  padding: 0.3em;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+  padding-left: 0.4em;
+  
+  
+}

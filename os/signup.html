@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>//INCARTI</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/lib/promise.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@2.0.11/dist/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <style>
+      div#medium-editor-toolbar-5{
+          display: none;
+      }
+  </style>
+
+
+</head>
+<body>
+    <script>
+        $( document ).ready(function() {
+            $('hidden2').hide();    
+            $('#said').hide();    
+        });
+    </script>
+    <div class="app">
+        <div class="wrapper">
+            <div class="left-side">
+                <div class="side-wrapper">
+
+                    <div class="content-section">
+                        <br>
+  
+                          <a href="index.html"><h1 id="content" style="font-family: arialBlack;">REVOLUT/OS </h1></a>
+  
+                     </div>
+
+          
+
+                     <div id="hidden2">
+                        <h1 id="entry1">WELCOME</h1>
+                        <p>What is your name?</p>
+                        <form id="form2"><input><button>Submit</button></form>
+
+                        <script src="https://cdn.jsdelivr.net/npm/gun/examples/jquery.js"></script>
+                        <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+                        <script>
+                        var gun1 = Gun()
+                
+                        $('#form2').on('submit', function (event) {
+                            event.preventDefault()
+                            var input = $('#form2').find('input')
+                            gun1.get('hello').put({ name: input.val() });
+                            input.val('')
+                        })
+                
+                        gun1.get('hello').on(function(data, key) {
+                            var h1 = $('#entry1')
+                            h1.text('Hello ' + data.name)
+                        })
+                        </script>
+                    </div>
+
+
+
+                    <div class="content-section" style="position: absolute; bottom: 50px;">
+                        
+
+
+                    
+
+
+                        <form id="sign">
+                            <input id="alias" placeholder="username" class="inputbox">
+                            <input id="pass" type="password" placeholder="passphrase" class="inputbox"><br><br><br>
+                            <input id="in" type="submit" value="sign in" class="content-button" style="color: white; height: 3em; width: 47%; font-size: 1em;">
+                            <input id="up" type="button" value="sign up" class="content-button" style="color: white; height: 3em; width: 47%; font-size: 1em;">
+                          </form>
+
+                          <ul></ul>
+                      
+                      
+                      
+                          <form id="said">
+                              <input id="say">
+                              <input id="speak" type="submit" value="speak">
+                          </form>
+                      
+                          <script src="https://cdn.jsdelivr.net/npm/gun/examples/jquery.js"></script>
+                          <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+                          <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+                          <script src="https://cdn.jsdelivr.net/npm/gun/lib/webrtc.js"></script>
+                          <script>
+                      
+                      
+                          var gun = Gun(['http://localhost:8765/gun', 'https://mvp-gun.herokuapp.com/gun', 'https://e2eec.herokuapp.com/gun']);
+                          var user = gun.user();
+                          
+                          $( document ).ready(function() {
+                              $('#hidden2').hide();    
+                              $('#said').hide();    
+                          });
+                      
+                      
+                          $('#up').on('click', function(e){
+                            user.create($('#alias').val(), $('#pass').val());
+                          });
+                      
+                          $('#sign').on('submit', function(e){
+                            e.preventDefault();
+                            user.auth($('#alias').val(), $('#pass').val());
+                          });
+                      
+                          $('#said').on('submit', function(e){
+                            e.preventDefault();
+                            if(!user.is){ return }
+                            user.get('said').set($('#say').val());
+                            $('#say').val("");
+                          });
+                      
+                          function UI(say, id){
+                            var li = $('#' + id).get(0) || $('<li>').attr('id', id).appendTo('ul');
+                            $(li).text(say);
+                          };
+                      
+                          gun.on('auth', function(){
+                            $('#sign').hide();
+                            user.get('said').map().once(UI);
+                            $('#hidden2').show();
+                            $('#said').show();
+                  
+                            
+                          });
+                          </script>
+
+                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>
